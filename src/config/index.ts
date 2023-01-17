@@ -9,6 +9,8 @@ interface Config {
   firebaseStorageRootBucketPath: string;
   fileNameSizeLimit: number;
   fileSizeLimitInBytes: number;
+  authServerEndPoint: string;
+  apiTimeoutInMilliseconds: number;
 }
 
 const config: Config = {
@@ -18,6 +20,8 @@ const config: Config = {
   firebaseStorageRootBucketPath: process.env.FIREBASE_STORAGE_ROOT_BUCKET_PATH!!,
   fileNameSizeLimit: parseInt(process.env.FILE_NAME_SIZE_LIMIT!!, 10),
   fileSizeLimitInBytes: parseInt(process.env.FILE_SIZE_LIMIT_IN_BYTES!!, 10),
+  authServerEndPoint: process.env.AUTH_SERVER_END_POINT!!,
+  apiTimeoutInMilliseconds: parseInt(process.env.API_TIMEOUT_IN_MILLISECONDS!!, 10),
 };
 
 export default config;

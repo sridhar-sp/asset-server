@@ -11,6 +11,7 @@ import { InvalidFileType } from "./constant/error";
 import SuccessResponse from "./model/successResponse";
 import { HTTP_STATUS_CODES } from "./constant/httpStatusCode";
 import singleImageFileGetRequestValidatorMiddleware from "./validator/singleImageFileGetRequestValidatorMiddleware";
+import AuthServiceProvider from "./service/authServiceProvider";
 
 const TAG = "APP";
 
@@ -32,9 +33,12 @@ const app: express.Application = express();
 
 app.use(bodyParser.json());
 
-// app.get("/", async (req: any, res: Response) => {
-//   res.status(200).json({ status: "Success" });
-// });
+app.use(AuthServiceProvider.accessTokenValidatorMiddleware);
+app.use(AuthServiceProvider.verifyAccessTokenMiddleware);
+
+app.get("/", async (req: any, res: Response) => {
+  res.status(200).json(SuccessResponse.createSuccessResponse(`${config.appName} is running.`));
+});
 
 app.get("/file", singleImageFileGetRequestValidatorMiddleware, async (req: any, res: Response) => {
   try {
@@ -56,14 +60,19 @@ app.post(
   "/image/upload",
   singleImageUploadMiddleware(multerImageUpload, "file"),
   singleFileUploadRequestValidator,
-  (req: any, res) => {
-    FileStoreProviderFactory.getFileStoreProvider(req)
-      .uploadFile(req.body.fileName, req.file.mimetype, req.body.bucketPath, req.file.buffer)
-      .then((successResponse: SuccessResponse) => res.status(successResponse.code).json(successResponse))
-      .catch((error) => {
-        if (error instanceof ErrorResponse) res.status(error.code).json(error);
-        else res.status(HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR).json(ErrorResponse.internalServerError());
-      });
+  async (req: any, res) => {
+    try {
+      const successResponse = await FileStoreProviderFactory.getFileStoreProvider(req).uploadFile(
+        req.body.fileName,
+        req.file.mimetype,
+        req.body.bucketPath,
+        req.file.buffer
+      );
+      res.status(successResponse.code).json(successResponse);
+    } catch (error: any) {
+      if (error instanceof ErrorResponse) res.status(error.code).json(error);
+      else res.status(HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR).json(ErrorResponse.internalServerError());
+    }
   }
 );
 
