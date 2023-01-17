@@ -16,12 +16,15 @@ const TAG = "APP";
 
 const SUPPORTED_IMAGE_TYPES = ["image/png", "image/jpg", "image/jpeg"];
 
-// Todo : Add size limit
 const multerImageUpload = multer({
   storage: multer.memoryStorage(),
   fileFilter: (_, file, cb) => {
     if (SUPPORTED_IMAGE_TYPES.includes(file.mimetype)) cb(null, true);
     else return cb(new InvalidFileType("file type not supported"));
+  },
+  limits: {
+    fieldNameSize: config.fileNameSizeLimit,
+    fileSize: config.fileSizeLimitInBytes,
   },
 });
 
