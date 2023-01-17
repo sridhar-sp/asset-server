@@ -55,7 +55,7 @@ app.post(
   singleFileUploadRequestValidator,
   (req: any, res) => {
     FileStoreProviderFactory.getFileStoreProvider(req)
-      .uploadFile(req.body.fileName, req.file.mimetype, req.body.bucketPath, req.file.encoding, req.file.buffer)
+      .uploadFile(req.body.fileName, req.file.mimetype, req.body.bucketPath, req.file.buffer)
       .then((successResponse: SuccessResponse) => res.status(successResponse.code).json(successResponse))
       .catch((error) => {
         if (error instanceof ErrorResponse) res.status(error.code).json(error);

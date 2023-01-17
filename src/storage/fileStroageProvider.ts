@@ -13,7 +13,6 @@ interface FileStorageProvider {
     fileName: string,
     mimetype: string,
     bucketPath: string,
-    contentEncoding: string,
     fileContentBuffer: Buffer
   ): Promise<SuccessResponse>;
 }

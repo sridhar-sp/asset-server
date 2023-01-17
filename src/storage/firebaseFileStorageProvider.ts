@@ -1,3 +1,4 @@
+import config from "../config";
 import FileStorageProvider, { FileResponse } from "./fileStroageProvider";
 import firebase from "../firebase";
 import SuccessResponse from "../model/successResponse";
@@ -6,7 +7,7 @@ import logger from "../logger";
 
 const TAG = "FirebaseFileStorageProvider";
 
-const ROOT_BUCKET_PATH = "gs://trumpcard-dev.appspot.com";
+const ROOT_BUCKET_PATH = config.firebaseStorageRootBucketPath;
 
 class FirebaseFileStorageProvider implements FileStorageProvider {
   storage = firebase.storage;
@@ -19,7 +20,6 @@ class FirebaseFileStorageProvider implements FileStorageProvider {
       return { contentType: metadata[0].contentType, stream: file.createReadStream() };
     } catch (error: any) {
       logger.logError(TAG, error);
-      // Todo Add more error cases
       throw ErrorResponse.internalServerError("Error retrieving image");
     }
   }
@@ -28,16 +28,25 @@ class FirebaseFileStorageProvider implements FileStorageProvider {
     fileName: string,
     mimetype: string,
     bucketPath: string,
-    contentEncoding: string,
     fileContentBuffer: Buffer
   ): Promise<SuccessResponse> {
-    console.log("**** fileName", fileName);
-    console.log("**** mimetype", mimetype);
-    console.log("**** bucketPath", bucketPath);
-    console.log("**** contentEncoding", contentEncoding);
-    console.log("**** fileContentBuffer", fileContentBuffer);
+    return new Promise((resolve: (successResponse: SuccessResponse) => void, reject: (error: any) => void) => {
+      try {
+        const file = this.storage.bucket(ROOT_BUCKET_PATH).file(`${bucketPath}/${fileName}`);
 
-    return SuccessResponse.createSuccessResponse();
+        file
+          .createWriteStream({ contentType: mimetype })
+          .on("error", (err) => {
+            logger.logError(TAG, `Error uploading image ${err}`);
+            reject(err);
+          })
+          .on("finish", () => resolve(SuccessResponse.createSuccessResponse()))
+          .end(fileContentBuffer);
+      } catch (error: any) {
+        logger.logError(TAG, error);
+        reject(new Error("Error uploading image"));
+      }
+    });
   }
 }
 
