@@ -56,8 +56,8 @@ app.get("/file", singleImageFileGetRequestValidatorMiddleware, async (req: any, 
   }
 });
 
-app.post(
-  "/image/upload",
+app.put(
+  "/file",
   singleImageUploadMiddleware(multerImageUpload, "file"),
   singleFileUploadRequestValidator,
   async (req: any, res) => {
