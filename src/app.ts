@@ -34,11 +34,11 @@ const authService = new AuthServiceImpl(config.authServerEndPoint, config.apiTim
 
 app.use(bodyParser.json());
 
-app.use(authService.verifyAuthMiddleware.bind(authService));
-
 app.get("/healthCheck", async (req: any, res: Response) => {
   res.status(200).json(SuccessResponse.createSuccessResponse(`${config.appName} is running.`));
 });
+
+app.use(authService.verifyAuthMiddleware.bind(authService));
 
 app.get("/file", singleImageFileGetRequestValidatorMiddleware, async (req: any, res: Response) => {
   try {
