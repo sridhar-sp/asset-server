@@ -11,7 +11,7 @@ import { InvalidFileType } from "./constant/error";
 import SuccessResponse from "./model/successResponse";
 import { HTTP_STATUS_CODES } from "./constant/httpStatusCode";
 import singleImageFileGetRequestValidatorMiddleware from "./validator/singleImageFileGetRequestValidatorMiddleware";
-import AuthServiceProvider from "./service/authServiceProvider";
+import AuthServiceImpl from "./auth/AuthServiceImpl";
 
 const TAG = "APP";
 
@@ -30,11 +30,11 @@ const multerImageUpload = multer({
 });
 
 const app: express.Application = express();
+const authService = new AuthServiceImpl(config.authServerEndPoint, config.apiTimeoutInMilliseconds);
 
 app.use(bodyParser.json());
 
-app.use(AuthServiceProvider.accessTokenValidatorMiddleware);
-app.use(AuthServiceProvider.verifyAccessTokenMiddleware);
+app.use(authService.verifyAuthMiddleware.bind(authService));
 
 app.get("/healthCheck", async (req: any, res: Response) => {
   res.status(200).json(SuccessResponse.createSuccessResponse(`${config.appName} is running.`));
