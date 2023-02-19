@@ -36,7 +36,7 @@ app.use(bodyParser.json());
 app.use(AuthServiceProvider.accessTokenValidatorMiddleware);
 app.use(AuthServiceProvider.verifyAccessTokenMiddleware);
 
-app.get("/", async (req: any, res: Response) => {
+app.get("/healthCheck", async (req: any, res: Response) => {
   res.status(200).json(SuccessResponse.createSuccessResponse(`${config.appName} is running.`));
 });
 
