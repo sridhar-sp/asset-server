@@ -11,7 +11,7 @@ import { InvalidFileType } from "./constant/error";
 import SuccessResponse from "./model/successResponse";
 import { HTTP_STATUS_CODES } from "./constant/httpStatusCode";
 import singleImageFileGetRequestValidatorMiddleware from "./validator/singleImageFileGetRequestValidatorMiddleware";
-import AuthServiceImpl from "./auth/AuthServiceImpl";
+import AuthServiceImpl from "./auth/authServiceImpl";
 
 const TAG = "APP";
 
